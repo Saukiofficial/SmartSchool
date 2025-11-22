@@ -28,7 +28,7 @@ use App\Http\Controllers\Guru\AbsensiMuridController;
 use App\Http\Controllers\Guru\AbsensiGuruController;
 use App\Http\Controllers\Guru\JadwalController as GuruJadwalController;
 
-// --- IMPORT CONTROLLER KEPALA SEKOLAH (BARU) ---
+// --- IMPORT CONTROLLER KEPALA SEKOLAH ---
 use App\Http\Controllers\Kepsek\DashboardController as KepsekDashboardController;
 
 // --- IMPORT CONTROLLER EXPORT PDF ---
@@ -40,13 +40,10 @@ use App\Http\Controllers\ExportPdfController;
 |--------------------------------------------------------------------------
 */
 
+// --- UBAH BAGIAN INI ---
+// Redirect root URL ('/') langsung ke halaman Login
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return redirect()->route('login');
 });
 
 // --- LOGIKA REDIRECT DASHBOARD ---
