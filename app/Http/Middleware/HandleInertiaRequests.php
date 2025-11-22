@@ -20,8 +20,9 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+                // TAMBAHKAN INI: Kirim daftar role user ke frontend
+                'roles' => $request->user() ? $request->user()->roles->pluck('name') : [],
             ],
-            // TAMBAHKAN BAGIAN INI:
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'error' => fn () => $request->session()->get('error'),

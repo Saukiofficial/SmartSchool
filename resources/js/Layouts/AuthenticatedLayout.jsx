@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import { Link, usePage } from '@inertiajs/react';
-// PERBAIKAN: Tambahkan 'BookOpen' di sini
 import {
     Home, Book, BookOpen, ClipboardCheck, ScanLine, User, Settings,
     Menu, X, Moon, Sun, LogOut, FileText, Building, Users,
@@ -12,7 +11,10 @@ import {
 export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [darkMode, setDarkMode] = useState(localStorage.getItem('theme') === 'dark');
-    const { url } = usePage();
+
+    // Ambil data roles yang dikirim dari Middleware
+    const { props } = usePage();
+    const roles = props.auth.roles || [];
 
     // --- LOGIC DARK MODE ---
     useEffect(() => {
@@ -25,10 +27,11 @@ export default function Authenticated({ user, header, children }) {
         }
     }, [darkMode]);
 
-    // --- LOGIC MENU BERDASARKAN ROLE ---
-    const isAdmin = url.startsWith('/admin');
-    const isGuru = url.startsWith('/guru');
-    const isKepsek = url.startsWith('/kepsek');
+    // --- LOGIC MENU BERDASARKAN ROLE (FIXED) ---
+    // Sekarang cek berdasarkan Role Database, bukan URL lagi
+    const isAdmin = roles.includes('Super Admin');
+    const isGuru = roles.includes('Guru');
+    const isKepsek = roles.includes('Kepala Sekolah');
 
     const menus = [
         // --- MENU GURU ---
@@ -170,7 +173,7 @@ export default function Authenticated({ user, header, children }) {
                     </Link>
                 ))}
 
-                <Link href={route('profile.edit')} className={`flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-500 dark:text-gray-400`}>
+                <Link href={route('profile.edit')} className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${route().current('profile.edit') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}`}>
                     <Settings size={20} />
                     <span className="text-[10px] font-medium">Akun</span>
                 </Link>

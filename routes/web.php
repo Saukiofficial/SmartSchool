@@ -40,13 +40,10 @@ use App\Http\Controllers\ExportPdfController;
 |--------------------------------------------------------------------------
 */
 
+// --- PERBAIKAN UTAMA DISINI ---
+// Redirect halaman depan ('/') langsung ke halaman Login
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return redirect()->route('login');
 });
 
 // --- LOGIKA REDIRECT DASHBOARD ---
@@ -118,15 +115,9 @@ Route::middleware('auth')->group(function () {
     // GROUP KEPALA SEKOLAH
     // =================================================================
     Route::prefix('kepsek')->group(function () {
-
-        // 1. Dashboard
         Route::get('/dashboard', [KepsekDashboardController::class, 'index'])->name('kepsek.dashboard');
-
-        // 2. Monitoring
         Route::get('/monitoring-jurnal', [KepsekDashboardController::class, 'monitoringJurnal'])->name('kepsek.jurnal');
         Route::get('/monitoring-absensi', [KepsekDashboardController::class, 'monitoringAbsensi'])->name('kepsek.absensi');
-
-        // 3. Laporan Siswa (INI YANG KEMARIN HILANG)
         Route::get('/laporan-siswa', [KepsekDashboardController::class, 'laporanSiswa'])->name('kepsek.laporan-siswa');
     });
 
