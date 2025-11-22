@@ -2,30 +2,39 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Users, BookOpen, Activity, CheckCircle, Clock, GraduationCap } from 'lucide-react';
 
-export default function DashboardKepsek({ auth, stats, chartData, recentJurnals }) {
+// PERBAIKAN: Menambahkan default value pada props untuk mencegah error "undefined" (Layar Putih)
+export default function DashboardKepsek({ auth, stats = {}, recentJurnals = [] }) {
+
+    // Safety Check: Memastikan variabel stats aman diakses meski datanya kosong
+    const safeStats = {
+        total_guru: stats?.total_guru || 0,
+        total_siswa: stats?.total_siswa || 0,
+        guru_hadir: stats?.guru_hadir || 0,
+        jurnal_masuk: stats?.jurnal_masuk || 0
+    };
 
     const statCards = [
         {
             title: 'Total Guru',
-            value: stats.total_guru,
+            value: safeStats.total_guru,
             icon: <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />,
             color: 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800'
         },
         {
             title: 'Total Siswa',
-            value: stats.total_siswa,
+            value: safeStats.total_siswa,
             icon: <GraduationCap className="w-6 h-6 text-orange-600 dark:text-orange-400" />,
             color: 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800'
         },
         {
             title: 'Guru Hadir Hari Ini',
-            value: stats.guru_hadir,
+            value: safeStats.guru_hadir,
             icon: <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />,
             color: 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
         },
         {
             title: 'Jurnal Masuk',
-            value: stats.jurnal_masuk,
+            value: safeStats.jurnal_masuk,
             icon: <BookOpen className="w-6 h-6 text-purple-600 dark:text-purple-400" />,
             color: 'bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:border-purple-800'
         },
@@ -94,12 +103,12 @@ export default function DashboardKepsek({ auth, stats, chartData, recentJurnals 
                                 recentJurnals.map((jurnal) => (
                                     <div key={jurnal.id} className="flex items-start gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors border border-transparent hover:border-indigo-100 dark:hover:border-indigo-800">
                                         <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold shrink-0 text-sm border-2 border-white dark:border-gray-600 shadow-sm">
-                                            {jurnal.guru.user.name.charAt(0)}
+                                            {jurnal.guru?.user?.name?.charAt(0)}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex justify-between items-start">
                                                 <h4 className="font-bold text-gray-800 dark:text-gray-100 truncate">
-                                                    {jurnal.guru.user.name}
+                                                    {jurnal.guru?.user?.name}
                                                 </h4>
                                                 <div className="text-xs text-gray-400 flex items-center gap-1 ml-2 whitespace-nowrap">
                                                     <Clock className="w-3 h-3" />
@@ -108,8 +117,8 @@ export default function DashboardKepsek({ auth, stats, chartData, recentJurnals 
                                             </div>
 
                                             <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5">
-                                                Mengajar <span className="font-semibold text-indigo-600 dark:text-indigo-400">{jurnal.mapel.nama_mapel}</span>
-                                                {' '}di kelas <span className="font-semibold text-indigo-600 dark:text-indigo-400">{jurnal.kelas.nama_kelas}</span>
+                                                Mengajar <span className="font-semibold text-indigo-600 dark:text-indigo-400">{jurnal.mapel?.nama_mapel}</span>
+                                                {' '}di kelas <span className="font-semibold text-indigo-600 dark:text-indigo-400">{jurnal.kelas?.nama_kelas}</span>
                                             </p>
 
                                             <div className="mt-2 flex flex-wrap gap-2">
@@ -157,15 +166,19 @@ export default function DashboardKepsek({ auth, stats, chartData, recentJurnals 
                                 </div>
                             </Link>
 
-                            <div className="group flex items-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 opacity-70 cursor-not-allowed">
-                                <div className="p-2 bg-white dark:bg-gray-600 rounded-lg mr-3 shadow-sm">
-                                    <GraduationCap className="w-5 h-5 text-gray-500 dark:text-gray-300" />
+                            {/* LINK LAPORAN SISWA (AKTIF) */}
+                            <Link
+                                href={route('kepsek.laporan-siswa')}
+                                className="group flex items-center p-4 rounded-xl bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/40 border border-orange-100 dark:border-orange-800 transition-all"
+                            >
+                                <div className="p-2 bg-white dark:bg-orange-800 rounded-lg mr-3 shadow-sm group-hover:scale-110 transition-transform">
+                                    <GraduationCap className="w-5 h-5 text-orange-600 dark:text-orange-300" />
                                 </div>
                                 <div>
-                                    <h5 className="font-bold text-gray-700 dark:text-gray-300">Laporan Siswa</h5>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">Segera Hadir</p>
+                                    <h5 className="font-bold text-orange-800 dark:text-orange-200">Laporan Siswa</h5>
+                                    <p className="text-xs text-orange-600 dark:text-orange-400">Rekap Absensi Siswa</p>
                                 </div>
-                            </div>
+                            </Link>
                         </div>
                     </div>
                 </div>

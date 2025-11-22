@@ -13,15 +13,11 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    /**
-     * Menampilkan Dashboard Utama Kepala Sekolah
-     * Statistik, Grafik, dan Aktivitas Terbaru
-     */
     public function index()
     {
         $today = Carbon::today();
 
-        // 1. Statistik Utama (Kartu Atas)
+        // 1. Siapkan Statistik Utama
         $stats = [
             'total_guru' => Guru::count(),
             'total_siswa' => Siswa::count(),
@@ -29,24 +25,16 @@ class DashboardController extends Controller
             'jurnal_masuk' => Jurnal::whereDate('tanggal', $today)->count(),
         ];
 
-        // 2. Data Grafik Kehadiran Guru (7 Hari Terakhir)
-        // Digunakan untuk chart di dashboard (jika ada)
+        // 2. Siapkan Data Grafik (Opsional, array kosong dulu gpp)
         $chartData = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::today()->subDays($i);
-            $chartData[] = [
-                'date' => $date->format('d M'),
-                'count' => AbsensiGuru::whereDate('tanggal', $date)->count()
-            ];
-        }
 
-        // 3. Feed Jurnal Terbaru (5 Data Terakhir)
-        // Menampilkan aktivitas real-time guru yang baru saja mengisi jurnal
+        // 3. Siapkan Jurnal Terbaru
         $recentJurnals = Jurnal::with(['guru.user', 'kelas', 'mapel'])
             ->latest()
             ->limit(5)
             ->get();
 
+        // PENTING: Kirim semua variabel di atas ke Inertia
         return Inertia::render('Kepsek/DashboardKepsek', [
             'stats' => $stats,
             'chartData' => $chartData,
@@ -54,43 +42,28 @@ class DashboardController extends Controller
         ]);
     }
 
-    /**
-     * Halaman Monitoring Jurnal Mengajar (Detail)
-     * Kepsek bisa melihat semua jurnal pada tanggal tertentu
-     */
     public function monitoringJurnal(Request $request)
     {
-        // Ambil tanggal dari request, default hari ini
         $date = $request->input('date', Carbon::today()->format('Y-m-d'));
-
-        $jurnals = Jurnal::with(['guru.user', 'kelas', 'mapel'])
-            ->whereDate('tanggal', $date)
-            ->latest()
-            ->get();
-
-        return Inertia::render('Kepsek/Monitoring/Jurnal', [
-            'jurnals' => $jurnals,
-            'filterDate' => $date
-        ]);
+        $jurnals = Jurnal::with(['guru.user', 'kelas', 'mapel'])->whereDate('tanggal', $date)->latest()->get();
+        return Inertia::render('Kepsek/Monitoring/Jurnal', ['jurnals' => $jurnals, 'filterDate' => $date]);
     }
 
-    /**
-     * Halaman Monitoring Absensi Guru (Detail)
-     * Kepsek bisa melihat siapa saja guru yang hadir/telat
-     */
     public function monitoringAbsensi(Request $request)
     {
-        // Ambil tanggal dari request, default hari ini
         $date = $request->input('date', Carbon::today()->format('Y-m-d'));
+        $absensis = AbsensiGuru::with('guru.user')->whereDate('tanggal', $date)->orderBy('jam_masuk')->get();
+        return Inertia::render('Kepsek/Monitoring/Absensi', ['absensis' => $absensis, 'filterDate' => $date]);
+    }
 
-        $absensis = AbsensiGuru::with('guru.user')
-            ->whereDate('tanggal', $date)
-            ->orderBy('jam_masuk')
-            ->get();
-
-        return Inertia::render('Kepsek/Monitoring/Absensi', [
-            'absensis' => $absensis,
-            'filterDate' => $date
+    public function laporanSiswa(Request $request)
+    {
+        // Logika laporan siswa (kosongkan atau copas dari step sebelumnya jika sudah ada)
+        // Agar tidak error method not found
+        return Inertia::render('Kepsek/Monitoring/LaporanSiswa', [
+            'laporan' => [],
+            'kelas_list' => [],
+            'filters' => []
         ]);
     }
 }

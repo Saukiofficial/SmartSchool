@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import { Link, usePage } from '@inertiajs/react';
+// PERBAIKAN: Tambahkan 'BookOpen' di sini
 import {
-    Home, Book, ClipboardCheck, ScanLine, User, Settings,
-    Menu, X, Moon, Sun, LogOut, FileText, Building, Users
+    Home, Book, BookOpen, ClipboardCheck, ScanLine, User, Settings,
+    Menu, X, Moon, Sun, LogOut, FileText, Building, Users,
+    Activity, GraduationCap
 } from 'lucide-react';
 
 export default function Authenticated({ user, header, children }) {
@@ -26,20 +28,30 @@ export default function Authenticated({ user, header, children }) {
     // --- LOGIC MENU BERDASARKAN ROLE ---
     const isAdmin = url.startsWith('/admin');
     const isGuru = url.startsWith('/guru');
+    const isKepsek = url.startsWith('/kepsek');
 
     const menus = [
-        // GURU MENUS
+        // --- MENU GURU ---
         { show: isGuru, title: 'Dashboard', icon: <Home size={20} />, href: route('guru.dashboard'), active: route().current('guru.dashboard') },
         { show: isGuru, title: 'Jurnal Mengajar', icon: <Book size={20} />, href: route('guru.jurnal.index'), active: route().current('guru.jurnal.*') },
         { show: isGuru, title: 'Absensi Siswa', icon: <ClipboardCheck size={20} />, href: route('guru.absensi.index'), active: route().current('guru.absensi.*') },
         { show: isGuru, title: 'Scan Kehadiran', icon: <ScanLine size={20} />, href: route('guru.absensi-saya.index'), active: route().current('guru.absensi-saya.*') },
+        { show: isGuru, title: 'Jadwal Saya', icon: <Activity size={20} />, href: route('guru.jadwal.index'), active: route().current('guru.jadwal.index') },
 
-        // ADMIN MENUS
+        // --- MENU ADMIN ---
         { show: isAdmin, title: 'Dashboard', icon: <Home size={20} />, href: route('admin.dashboard'), active: route().current('admin.dashboard') },
         { show: isAdmin, title: 'Data Guru', icon: <Users size={20} />, href: route('gurus.index'), active: route().current('gurus.*') },
+        { show: isAdmin, title: 'Data Siswa', icon: <GraduationCap size={20} />, href: route('siswas.index'), active: route().current('siswas.*') },
         { show: isAdmin, title: 'Data Kelas', icon: <Building size={20} />, href: route('kelas.index'), active: route().current('kelas.*') },
+        { show: isAdmin, title: 'Jadwal Pelajaran', icon: <Activity size={20} />, href: route('jadwals.index'), active: route().current('jadwals.*') },
         { show: isAdmin, title: 'Mata Pelajaran', icon: <Book size={20} />, href: route('mapels.index'), active: route().current('mapels.*') },
         { show: isAdmin, title: 'QR Display', icon: <ScanLine size={20} />, href: route('admin.qr.generate'), active: route().current('admin.qr.generate') },
+
+        // --- MENU KEPALA SEKOLAH ---
+        { show: isKepsek, title: 'Dashboard', icon: <Home size={20} />, href: route('kepsek.dashboard'), active: route().current('kepsek.dashboard') },
+        { show: isKepsek, title: 'Monitoring Jurnal', icon: <BookOpen size={20} />, href: route('kepsek.jurnal'), active: route().current('kepsek.jurnal') },
+        { show: isKepsek, title: 'Rekap Kehadiran', icon: <ClipboardCheck size={20} />, href: route('kepsek.absensi'), active: route().current('kepsek.absensi') },
+        { show: isKepsek, title: 'Laporan Siswa', icon: <GraduationCap size={20} />, href: route('kepsek.laporan-siswa'), active: route().current('kepsek.laporan-siswa') },
     ];
 
     return (

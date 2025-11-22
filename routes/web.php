@@ -36,18 +36,20 @@ use App\Http\Controllers\ExportPdfController;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes (Sistem Informasi Sekolah)
+| Web Routes (Aplikasi Sekolah)
 |--------------------------------------------------------------------------
 */
 
-// --- UBAH BAGIAN INI ---
-// Redirect root URL ('/') langsung ke halaman Login
 Route::get('/', function () {
-    return redirect()->route('login');
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
 });
 
 // --- LOGIKA REDIRECT DASHBOARD ---
-// Mengarahkan user ke halaman yang tepat berdasarkan ROLE
 Route::get('/dashboard', function () {
     /** @var \App\Models\User $user */
     $user = Auth::user();
@@ -62,7 +64,6 @@ Route::get('/dashboard', function () {
         return redirect()->route('kepsek.dashboard');
     }
 
-    // Fallback (User umum)
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -77,8 +78,6 @@ Route::middleware('auth')->group(function () {
     // GROUP SUPER ADMIN
     // =================================================================
     Route::prefix('admin')->group(function () {
-
-        // 1. DASHBOARD ADMIN
         Route::get('/dashboard', function() {
             $stats = [
                 'total_guru' => Guru::count(),
@@ -90,14 +89,11 @@ Route::middleware('auth')->group(function () {
             return Inertia::render('Admin/DashboardSuperAdmin', ['stats' => $stats]);
         })->name('admin.dashboard');
 
-        // 2. RESOURCE DATA MASTER
         Route::resource('kelas', KelasController::class);
         Route::resource('mapels', MapelController::class);
         Route::resource('gurus', GuruController::class);
         Route::resource('siswas', SiswaController::class);
         Route::resource('jadwals', JadwalController::class);
-
-        // 3. QR CODE DISPLAY
         Route::get('/generate-qr', [AbsensiGuruController::class, 'generateQr'])->name('admin.qr.generate');
     });
 
@@ -105,25 +101,16 @@ Route::middleware('auth')->group(function () {
     // GROUP GURU
     // =================================================================
     Route::prefix('guru')->group(function () {
-
-        // 1. DASHBOARD GURU
         Route::get('/dashboard', function() {
             return Inertia::render('Guru/DashboardGuru');
         })->name('guru.dashboard');
 
-        // 2. JURNAL MENGAJAR
         Route::get('/jurnal', [JurnalController::class, 'index'])->name('guru.jurnal.index');
         Route::post('/jurnal', [JurnalController::class, 'store'])->name('guru.jurnal.store');
-
-        // 3. ABSENSI MURID
         Route::get('/absensi', [AbsensiMuridController::class, 'index'])->name('guru.absensi.index');
         Route::post('/absensi', [AbsensiMuridController::class, 'store'])->name('guru.absensi.store');
-
-        // 4. SCAN ABSENSI GURU (KEHADIRAN DIRI)
         Route::get('/absensi-saya', [AbsensiGuruController::class, 'index'])->name('guru.absensi-saya.index');
         Route::post('/absensi-saya/scan', [AbsensiGuruController::class, 'store'])->name('guru.absensi-saya.store');
-
-        // 5. JADWAL MENGAJAR SAYA
         Route::get('/jadwal', [GuruJadwalController::class, 'index'])->name('guru.jadwal.index');
     });
 
@@ -132,12 +119,15 @@ Route::middleware('auth')->group(function () {
     // =================================================================
     Route::prefix('kepsek')->group(function () {
 
-        // 1. DASHBOARD UTAMA
+        // 1. Dashboard
         Route::get('/dashboard', [KepsekDashboardController::class, 'index'])->name('kepsek.dashboard');
 
-        // 2. MONITORING
+        // 2. Monitoring
         Route::get('/monitoring-jurnal', [KepsekDashboardController::class, 'monitoringJurnal'])->name('kepsek.jurnal');
         Route::get('/monitoring-absensi', [KepsekDashboardController::class, 'monitoringAbsensi'])->name('kepsek.absensi');
+
+        // 3. Laporan Siswa (INI YANG KEMARIN HILANG)
+        Route::get('/laporan-siswa', [KepsekDashboardController::class, 'laporanSiswa'])->name('kepsek.laporan-siswa');
     });
 
     // =================================================================
