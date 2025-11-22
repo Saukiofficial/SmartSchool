@@ -31,6 +31,9 @@
                 });
             }
         </script>
+        <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="/images/icons/icons.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/images/icons/icons.png">
     </head>
     <body class="font-sans antialiased">
         @inertia

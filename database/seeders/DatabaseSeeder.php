@@ -44,12 +44,11 @@ class DatabaseSeeder extends Seeder
         $roleGuru = Role::where('name', 'Guru')->first();
         $guruUser->roles()->attach($roleGuru);
 
-        // PENTING: Buat juga data profil di tabel 'gurus'
-        // Tanpa ini, guru tidak bisa absen/isi jurnal
+
         Guru::create([
             'user_id' => $guruUser->id,
             'status_aktif' => true,
-            // mapel_id dan kelas_id bisa null dulu jika belum ada data mapel/kelas
+
         ]);
 
 
