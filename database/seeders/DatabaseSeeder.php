@@ -12,28 +12,21 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Jalankan RoleSeeder dulu (PENTING)
-        // Pastikan RoleSeeder.php sudah ada dan benar isinya
+ 
         $this->call(RoleSeeder::class);
 
-        // ---------------------------------------------------------
-        // 2. BUAT AKUN SUPER ADMIN
-        // ---------------------------------------------------------
+   
         $admin = User::create([
             'name' => 'Administrator',
-            'username' => 'admin', // Username untuk login
+            'username' => 'admin',
             'email' => 'admin@sekolah.id',
-            'password' => Hash::make('password123'), // Password default
+            'password' => Hash::make('password123'),
         ]);
 
-        // Assign Role Super Admin ke user ini
+
         $roleAdmin = Role::where('name', 'Super Admin')->first();
         $admin->roles()->attach($roleAdmin);
 
-
-        // ---------------------------------------------------------
-        // 3. BUAT AKUN GURU (DUMMY)
-        // ---------------------------------------------------------
         $guruUser = User::create([
             'name' => 'Pak Fhadol, S.Pd',
             'username' => 'guru fhadol',
@@ -52,9 +45,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        // ---------------------------------------------------------
-        // 4. BUAT AKUN KEPALA SEKOLAH
-        // ---------------------------------------------------------
+
         $kepsek = User::create([
             'name' => 'Dr. Kepala Sekolah, M.Pd',
             'username' => 'kepsek',
